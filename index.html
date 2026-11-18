@@ -182,6 +182,25 @@ blockquote::after{content:"”";font-weight:900;margin-left:2px}
 .legend span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
 .legend .l1::before{background:var(--green)} .legend .l2::before{background:var(--red)} .legend .l3::before{background:var(--blue)}
 
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:14px;margin:14px 0 0 40px}
+.vfig{border:1.5px solid var(--ink);background:#fff;display:flex;flex-direction:column;min-width:0}
+.vfig.ok{border-color:var(--green)} .vfig.no{border-color:var(--red)}
+.vimg{position:relative;background:#f3f3f3;aspect-ratio:4/3;display:grid;place-items:center;border-bottom:1px solid var(--rule);overflow:hidden}
+.vimg img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.vlet{position:absolute;top:6px;left:6px;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-weight:700}
+.vpos{position:absolute;top:6px;right:6px;background:#fff;border:1.5px solid var(--ink);font-family:var(--mono);font-weight:700;font-size:12.5px;padding:1px 7px}
+.vfig.ok .vpos{border-color:var(--green);color:var(--green)} .vfig.no .vpos{border-color:var(--red);color:var(--red)}
+.vbody{padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.vbody label{font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.vbody select{border:1.5px solid var(--ink);background:#fff;padding:3px 6px;border-radius:0}
+.vbody textarea{width:100%;min-height:96px;resize:vertical;border:1px solid var(--ink);padding:6px 8px;font-size:14px;line-height:1.55;border-radius:0}
+.vname{font-weight:900;color:var(--blue);line-height:1.3}
+.vname small{display:block;font-weight:500;color:var(--ink2);font-family:var(--mono);font-size:11.5px}
+.vorder{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:.02em}
+.vbody .keys{font-size:13px}
+.vbody .mine,.vbody .model{font-size:13.5px;padding:7px 9px}
+.vbody .src{margin-top:4px}
+@media (max-width:640px){.vgrid{margin-left:0;grid-template-columns:1fr}}
 .summary{border:2px solid var(--ink);padding:18px 20px;margin-top:30px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .summary div b{display:block;font-family:var(--mono);font-size:24px}
 .summary div span{font-size:12.5px;color:var(--ink2)}
@@ -242,12 +261,14 @@ const LEC = {
   L10:`10 Digital Heritage and Digital Museum`, WR:`Lecture Wrap-up`, NT:`문화기술론 강의노트`
 };
 const LVN={1:`초급`,2:`중급`,3:`고급`}, LVE={1:`BEGINNER`,2:`INTERMEDIATE`,3:`ADVANCED`};
-const MCQ=[],SHORT=[],ESSAY=[],PEOPLE=[];
+const MCQ=[],SHORT=[],ESSAY=[],PEOPLE=[],VIS=[];
 const _c={};const nid=(p,lv)=>{const k=p+lv;_c[k]=(_c[k]||0)+1;return `${p}${lv}-${String(_c[k]).padStart(3,'0')}`;};
 function M(lv,lec,p,c,q,o,ex,qt,x){x=x||{};MCQ.push({id:nid('m',lv),kind:'mcq',lv,lec,p,c,q,o,ex,qt,w:x.w,n:x.n,stem:x.stem});}
 function S(lv,lec,p,c,q,acc,ans,ex,qt,x){x=x||{};SHORT.push({id:nid('s',lv),kind:'short',lv,lec,p,c,q,acc,ans,ex,qt,w:x.w,n:x.n,all:x.all,order:x.order,anyOf:x.anyOf,min:x.min});}
 function E(lv,lec,p,c,q,model,keys,quotes,x){x=x||{};ESSAY.push({id:nid('e',lv),kind:'essay',lv,lec,p,c,q,model,keys:keys.map(k=>({t:k[0],en:k[1],ko:k[2]})),quotes,w:x.w,n:x.n});}
 function P(img,name,lv,lec,p,ach,qt,x){x=x||{};PEOPLE.push({id:'p-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-'),kind:'pair',img,name,lv,lec,p,ach,qt,w:x.w,n:x.n,work:!!x.work,c:name});}
+function V(lv,lec,c,q,items,x){x=x||{};const its=items.map(i=>({img:i[0],name:i[1],when:i[2],model:i[3],keys:i[4].map(k=>({t:k[0],en:k[1],ko:k[2]})),src:i[5]}));
+  VIS.push({id:nid('v',lv),kind:'visual',lv,lec,p:[...new Set(its.map(i=>i.src[0]===lec?i.src[1]:i.src[0]+' '+i.src[1]))].sort((a,b)=>parseInt(String(a).replace(/\D/g,''))-parseInt(String(b).replace(/\D/g,''))).join(', '),c,q,items:its,w:x.w,n:x.n});}
 // ===== Beginner MCQ. M(lv, lec, page, concept, question, [correct, d1, d2, d3], explanation, quote, opts{w,n,img,stem}) =====
 M(1,`L01`,12,`Edward B. Tylor — definition of culture`,
 `"Culture ... is that complex whole which includes knowledge, belief, art, morals, law, custom, and any other capabilities and habits acquired by man as a member of society." Who wrote this, and in which work?`,
@@ -2273,8 +2294,255 @@ E(3,`L03`,`58–74`,`Culture emerges from digital technology`,
  [`Analytical link between characteristics and AI culture`,[`because`,`therefore`,`leads to`,`led to`,`shape`],[`때문`,`따라서`,`이어`]]],
 [[`L03`,63,`Oral culture | Print culture | the oral field of speech | the visual field of writing`],[`L03`,65,`Being Digital (1985) • Atom vs. Bits • Atom -> Bits : Shift • Atom + Bits : Fusion`],[`L03`,74,`1. Uniformity … 2. Subjectivity: matter of interpretation 3. Universality: simulation of everything 4. Duality: real vs. virtual 5. Non-linearity: recombination, reconfiguration`]],{n:11});
 
+/* Visual history essays: several pictures, put them in chronological order, explain each one's place in the flow.
+   V(lv, lec, concept, question, items[ [img, name, when, model, keys, [lec,page,quote]] ...in correct order ], opts{w,n}) */
+
+V(1,`L01`,`From techne to accelerating returns`,
+`The pictures show five thinkers who appear in the lecture's account of how "technology" has been understood. Put them in chronological order and, for each picture, explain who it is and what idea about technology he contributed.`,
+[[`people/aristotle.jpg`,`Aristotle`,`Greek antiquity`,
+  `Aristotle defined techne as the "trained ability of making something under the guidance of rational thought" and held that technology imitates nature (natural teleology), sometimes supporting and surpassing nature.`,
+  [[`Aristotle`,[`aristotle`],[`아리스토텔레스`]],[`techne / imitates nature`,[`techne`,`imitat`,`rational thought`],[`테크네`,`모방`,`자연`]]],
+  [`L02`,8,`Aristotle's view • imitates natural teleology on the general level of directivity and purposiveness ('technology imitates nature') • sometimes supports and surpass nature in producing new things`]],
+ [`people/beckmann.jpg`,`Johann Beckmann`,`1777`,
+  `Johann Beckmann wrote the textbook 'Guide to Technology' (1777), which marks the birth of the word 'Technology' as a name for systematic knowledge of crafts.`,
+  [[`Beckmann`,[`beckmann`],[`베크만`]],[`Guide to Technology 1777 — birth of the word`,[`1777`,`guide to technology`,`word`,`term`],[`1777`,`단어`,`용어`]]],
+  [`L01`,47,`Johann Beckmann • A textbook 'Guide to Technology' (1777) • A birth of the word 'Technology'`]],
+ [`people/kapp.jpg`,`Ernst Kapp`,`1877`,
+  `Ernst Kapp introduced the term "philosophy of technology" in Grundlinien einer Philosophie der Technik (1877) and proposed organ projection: tools are unconscious projections of human organs.`,
+  [[`Kapp`,[`kapp`],[`카프`]],[`philosophy of technology / organ projection`,[`philosophy of technology`,`organ projection`,`projection`,`1877`],[`기술철학`,`기관 투사`,`투사`]]],
+  [`L02`,15,`Ernst Kapp • "Grundlinien einer Philosophie der Technik" (Elements of a Philosophy of Technology) (1877) • Introduced the term "philosophy of technology"`]],
+ [`people/mcluhan.jpg`,`Marshall McLuhan`,`1964`,
+  `Marshall McLuhan, in Understanding Media: The Extensions of Man (1964), argued that "the medium is the message" and that all media are extensions of some human faculty — the wheel extends the foot, electric circuitry the central nervous system.`,
+  [[`McLuhan`,[`mcluhan`],[`맥루한`,`맥루언`]],[`medium is the message / extensions of man`,[`medium is the message`,`extension`,`1964`],[`미디어는 메시지`,`확장`]]],
+  [`L02`,20,`"All media are extensions of some human facultypsychic or physical." • Technology as an extension and an enhancement of body and cognitive functions`]],
+ [`people/kurzweil.jpg`,`Ray Kurzweil`,`2005`,
+  `Ray Kurzweil's Law of Accelerating Returns contrasts the intuitive linear view with the historical exponential view of technological change (The Singularity is Near, 2005).`,
+  [[`Kurzweil`,[`kurzweil`],[`커즈와일`]],[`accelerating returns / exponential`,[`accelerating`,`exponential`,`singularity`],[`수확 가속`,`기하급수`,`지수`,`특이점`]]],
+  [`L01`,54,`The Law of Accelerating Returns by Ray Kurzweil | The Singularity is Near (2005)`]]],
+{w:11,n:4});
+
+V(1,`L05`,`Trend in computing technology`,
+`The pictures show computers from four eras discussed in "Pervasive Computing." Put them in chronological order and, for each picture, name the era and describe the relationship between people and computers in that era.`,
+[[`v/eniac.jpg`,`Mainframe era (ENIAC)`,`1960s–1970s · N:1`,
+  `Mainframe era (ENIAC, 1946; 1960s–70s): one computer shared by many people — an N:1 relationship between users and computers.`,
+  [[`Mainframe / ENIAC`,[`mainframe`,`eniac`],[`메인프레임`,`에니악`]],[`one computer shared by many (N:1)`,[`n:1`,`shared`,`many people`],[`공유`,`여러 사람`]]],
+  [`L05`,5,`ENIAC (Electronic Numerical Integrator and Computer, 1946) • 1970s | Mainframe Era | one computer shared by many people`]],
+ [`v/pc.jpg`,`Personal computer era`,`1980s–1990s · 1:1`,
+  `Personal computer era (1980s–90s): one person, one computer — a 1:1 relationship; computing became decentralized.`,
+  [[`Personal computer`,[`personal computer`,`pc`],[`개인용 컴퓨터`,`PC`]],[`1:1 / one person one computer`,[`1:1`,`one person`,`decentraliz`],[`1:1`,`한 사람`,`분산`]]],
+  [`L05`,6,`Decentralized • Centralized (Server-Client) • Networked | Personal Computer Era`]],
+ [`v/net.jpg`,`Networked / internet era`,`1990s–2000s · 1:N`,
+  `Networked era (1990s–2000s): computers connected as server–client and peer-to-peer networks, so one person reaches many computers — 1:N.`,
+  [[`Network / internet`,[`network`,`internet`,`server`,`client`,`peer`],[`네트워크`,`인터넷`,`서버`]],[`1:N`,[`1:n`,`many computers`],[`1:N`,`여러 컴퓨터`]]],
+  [`L05`,14,`1960s-1970s | 1980s-1990s | 1990s-2000s | 2000s- | N:1 | 1:1 | 1:N | 1:N, N:M`]],
+ [`v/watch.jpg`,`Pervasive computing era`,`2000s– · 1:N, N:M`,
+  `Pervasive (ubiquitous) computing era (2000s–): computing appears anytime and everywhere in smartphones, wearables and embedded devices; many people and many devices interact — 1:N and N:M.`,
+  [[`Pervasive / ubiquitous`,[`pervasive`,`ubiquitous`,`embedded`,`wearable`],[`퍼베이시브`,`유비쿼터스`,`임베디드`,`웨어러블`]],[`N:M / anytime everywhere`,[`n:m`,`anytime`,`everywhere`],[`N:M`,`언제`,`어디서나`]]],
+  [`L05`,2,`Computing is made to appear anytime and everywhere`]]],
+{w:29,n:19});
+
+V(1,`L03`,`Culture emerges from technologies`,
+`"Culture emerges from technologies." Put the five pictures in chronological order and, for each one, explain what kind of culture it represents and how the dominant technology shaped that culture.`,
+[[`v/handaxe.jpg`,`Paleolithic stone tools`,`Pre-history`,
+  `Pre-historic culture is characterized by its tools (material): the Paleolithic age is named after chipped stone tools such as hand axes.`,
+  [[`Paleolithic / stone age`,[`paleolithic`,`stone`],[`구석기`,`석기`]],[`culture characterized by tools`,[`tool`,`material`],[`도구`,`재료`]]],
+  [`L03`,59,`Characterized by tools(material) • Pre-history( Paleolithic age ; Neolithic age Bronze age Iron Age ) culture`]],
+ [`v/bronze.jpg`,`Bronze age`,`Pre-history`,
+  `The Bronze age follows the Neolithic: metal tools and weapons gave the period its name, again showing culture characterized by its material technology.`,
+  [[`Bronze age`,[`bronze`],[`청동`]],[`metal tools`,[`metal`,`weapon`,`tool`],[`금속`,`무기`,`도구`]]],
+  [`L03`,59,`Characterized by tools(material) • Pre-history( Paleolithic age ; Neolithic age Bronze age Iron Age ) culture`]],
+ [`people/gutenberg.jpg`,`Johannes Gutenberg`,`1439`,
+  `Gutenberg introduced mechanical movable type printing to Europe (1439), giving birth to print culture — a culture based primarily on words and printing.`,
+  [[`Gutenberg`,[`gutenberg`],[`구텐베르크`]],[`movable type → print culture`,[`print`,`movable type`,`1439`],[`인쇄`,`활자`]]],
+  [`L03`,62,`Introduction of mechanical movable type printing to Europe (1439) | Johannes Gutenberg | → Birth of Print Culture`]],
+ [`v/boulevard.jpg`,`Daguerreotype`,`1839`,
+  `The Daguerreotype (1839) — Boulevard du Temple — began photography, moving us from print culture to a visual culture based on images; Delaroche declared "From today painting is dead."`,
+  [[`Daguerreotype / photography`,[`daguerre`,`photograph`],[`다게르`,`사진`]],[`visual culture based on images`,[`visual culture`,`image`,`painting is dead`],[`시각 문화`,`이미지`]]],
+  [`L09`,65,`"From today painting is dead" - Paul Delaroche | L.J.M.Daguerre, 1789-1851 | Daguerreotype (1839)`]],
+ [`v/vrhmd.jpg`,`Virtual reality`,`Today`,
+  `Virtual reality is the latest step in the technological innovations (photography, motion picture, television, computer graphics, internet) that lead to visual culture and the representation of reality.`,
+  [[`Virtual reality`,[`virtual reality`,`vr`,`hmd`],[`가상현실`,`VR`]],[`representation of reality`,[`representation`,`reality`,`immers`],[`재현`,`현실`,`몰입`]]],
+  [`L09`,12,`Photography | Motion picture | Television | Computer graphics | Internet | Technological innovation leading to a visual culture | Print culture based primarily on words and printing | Visual culture based on images | Virtual Reality`]]],
+{w:46,n:3});
+
+V(2,`L10`,`From Mouseion to virtual museum`,
+`The pictures trace the history of the museum as told in the lecture. Put them in chronological order and, for each picture, identify what it is and explain how the idea of the museum changed at that stage.`,
+[[`v/mouseion.jpg`,`Mouseion of Alexandria`,`3C BCE`,
+  `The Mouseion — a temple dedicated to the Muses. The Mouseion of Alexandria (founded about 3C BCE) had some objects but was chiefly a repository of texts.`,
+  [[`Mouseion`,[`mouseion`,`alexandria`],[`무세이온`,`알렉산드리아`]],[`temple of Muses / repository of texts`,[`muse`,`text`,`temple`],[`뮤즈`,`문헌`,`신전`,`텍스트`]]],
+  [`L10`,76,`Mouseion | A temple dedicated to the Muses • The Mouseion of Alexandria • founded about the 3C BCE / destroyed in the 3rd CE • had some objects but chiefly a repository of texts`]],
+ [`v/cabinet.jpg`,`Cabinet of Curiosities (Ole Worm)`,`16–17C`,
+  `The Cabinet of Curiosities (Kunstkammer, Wunderkammer, Cabinets of Wonder) — private collections of wonders such as Ole Worm's (1588–1654).`,
+  [[`Cabinet of curiosities`,[`cabinet`,`curiosit`,`wunderkammer`,`kunstkammer`,`worm`],[`호기심의 방`,`분더카머`,`진기한`]],[`private collection of wonders`,[`collect`,`wonder`,`private`],[`수집`,`개인`,`경이`]]],
+  [`L10`,77,`AKA Kunstkabinett, Kunstkammer or Wunderkammer; also Cabinets of Wonder | Cabinet of Curiosities`]],
+ [`v/prado.jpg`,`Public museum buildings (Prado, 1820)`,`1820s`,
+  `Public national museums such as the Museo del Prado (1820), the National Gallery (1824) and the Altes Museum (1830): a collections-focused, building-based institution, the museum as a 'cultural authority' open to the public.`,
+  [[`Public museum (Prado / National Gallery / Altes)`,[`prado`,`national gallery`,`altes`,`public`],[`프라도`,`내셔널 갤러리`,`알테스`,`공공`]],[`building-based / cultural authority`,[`building`,`collection`,`authority`],[`건물`,`소장품`,`권위`]]],
+  [`L10`,79,`The National Gallery (Britain,1824) | Museo Nacional del Prado (Spain,1820) | Altes Museum (Germany,1830)`]],
+ [`v/malraux.jpg`,`Museum without Walls (Malraux)`,`1947`,
+  `André Malraux's Museum without Walls (1947): a montage of photographic representations of works of art — "An art book is a museum without walls."`,
+  [[`Malraux / museum without walls`,[`malraux`,`without walls`],[`말로`,`벽 없는`]],[`photographic reproductions`,[`photograph`,`book`,`montage`],[`사진`,`복제`,`책`]]],
+  [`L10`,92,`Museum without Walls • A montage of photographic representations of works of art from 1947 | André Malraux 1901-1976`]],
+ [`v/monalisa.jpg`,`Virtual museum (Mona Lisa: Beyond the Glass)`,`Today`,
+  `The virtual museum — online, either as a virtual complement to the physical museum or as a museum in its own right; e.g. Mona Lisa: Beyond the Glass, the Louvre's first VR experience.`,
+  [[`Virtual museum`,[`virtual museum`,`online`,`virtual reality`,`vr`,`louvre`],[`가상 박물관`,`온라인`,`루브르`]],[`complement or museum in its own right`,[`complement`,`own right`,`digital`],[`보완`,`독립`,`디지털`]]],
+  [`L10`,95,`This definition emphasizes the characteristic "online" of virtual museums • Virtual museum as a virtual complement to the physical museum • as a museum in its own right`]]],
+{w:56,n:27});
+
+V(2,`L07`,`Stages of VR`,
+`The pictures show milestones from the "Stages of VR." Put them in chronological order and, for each picture, name the work or person and explain which stage of VR it belongs to and what it contributed.`,
+[[`v/cinerama.jpg`,`Cinerama`,`1952`,
+  `Cinerama (1952) — immersive theatre with a wide curved screen; a forerunner of immersion in the first stage of visionaries (1950s–1980s).`,
+  [[`Cinerama`,[`cinerama`],[`시네라마`]],[`immersive theatre`,[`immersive`,`theatre`,`theater`,`screen`],[`몰입`,`극장`,`스크린`]]],
+  [`L07`,21,`Cinerama (1952) | Immersive Theatre | Sensorama (1962)`]],
+ [`v/sensorama.jpg`,`Sensorama (Morton Heilig)`,`1962`,
+  `Morton Heilig's Sensorama (developed from 1957, patented 1962) — an immersive, multi-sensory simulator: a motorcycle ride through Brooklyn with vibrations, sounds, smells and wind, but not interactive. Heilig is the "father of VR."`,
+  [[`Sensorama / Heilig`,[`sensorama`,`heilig`],[`센서라마`,`하일리그`]],[`multi-sensory, not interactive`,[`multi-sensory`,`smell`,`not interactive`,`senses`],[`다감각`,`냄새`,`비상호작용`,`상호작용 없`]]],
+  [`L07`,27,`Developed from 1957 and patented in 1962 • Ten-minute-long motorcycle ride through Brooklyn • The corresponding vibrations, sounds, smells, and rushes of wind • Not interactive`]],
+ [`img/s_damocles.jpg`,`Sword of Damocles (Ivan Sutherland)`,`1968`,
+  `Ivan Sutherland's Sword of Damocles (1968), the head-mounted display realizing his "Ultimate Display" (1965): a window through which one looks into a virtual world that responds in real time.`,
+  [[`Sutherland / Sword of Damocles`,[`sutherland`,`damocles`],[`서덜랜드`,`다모클레스`]],[`HMD / ultimate display`,[`hmd`,`head-mounted`,`ultimate display`,`window`],[`HMD`,`머리`,`궁극의 디스플레이`]]],
+  [`L07`,37,`Head-Mounted Display | Headsight (1961) by Philco Corporation engineers | Sword of Damocles (1968) by Ivan Sutherland`]],
+ [`v/videoplace.jpg`,`Videoplace (Myron Krueger)`,`1975`,
+  `Myron Krueger's Artificial Reality — Metaplay (1970) and Videoplace (1975): the user's body silhouette interacts with graphics without wearing any device.`,
+  [[`Krueger / Videoplace`,[`krueger`,`videoplace`,`metaplay`],[`크루거`,`비디오플레이스`]],[`artificial reality / body interaction`,[`artificial reality`,`body`,`silhouette`,`interact`],[`인공 현실`,`몸`,`상호작용`]]],
+  [`L07`,33,`Metaplay (1970) | Myron Krueger: Artificial Reality | Videoplace (1975)`]],
+ [`people/lanier.jpg`,`Jaron Lanier`,`3rd stage · 1990s–2000`,
+  `Jaron Lanier popularized the term "Virtual Reality" in the third stage (1990s–2000), when VR became a general purpose technology with a VR culture and industry — followed by a decline ("solutions without problems").`,
+  [[`Lanier`,[`lanier`],[`래니어`,`레니어`]],[`3rd stage: term VR, general purpose technology`,[`virtual reality`,`general purpose`,`3rd`,`third`,`industry`],[`가상현실`,`범용`,`3단계`,`산업`]]],
+  [`L07`,41,`VR as the general purpose technology • Popularization of the term "Virtual Reality" by Jaron Lanier • VR culture • VR industry -> Game industry • The decline of VR - 'Solutions without problems' | The 3rd Stage (1990s - 2000)`]]],
+{w:37,n:20});
+
+V(2,`L09`,`Development of perspective`,
+`The pictures trace how painters learned to represent 3D reality on a 2D surface. Put them in chronological order and, for each picture, identify the work or person and explain its role in the development of perspective.`,
+[[`v/duccio.jpg`,`Duccio, The Calling of the Apostles Peter and Andrew`,`1308–1311`,
+  `Duccio's The Calling of the Apostles Peter and Andrew (1308–1311): before linear perspective, space looks flat — the 3D world is not yet consistently represented on the 2D surface.`,
+  [[`Duccio`,[`duccio`],[`두초`]],[`flat, pre-perspective`,[`flat`,`before perspective`,`no perspective`,`2d`],[`평면`,`원근법 이전`,`평평`]]],
+  [`L09`,18,`The Calling of the Apostles Peter and Andrew 1308-1311 - Duccio Di Buoninsegna`]],
+ [`people/brunelleschi.jpg`,`Filippo Brunelleschi`,`1425`,
+  `Filippo Brunelleschi's experiment (1425) demonstrated linear perspective with a painted panel and a mirror.`,
+  [[`Brunelleschi`,[`brunelleschi`],[`브루넬레스키`]],[`experiment demonstrating linear perspective`,[`experiment`,`linear perspective`,`mirror`,`1425`],[`실험`,`선원근법`,`거울`]]],
+  [`L09`,27,`Brunelleschi's Experiment (1425)`]],
+ [`v/trinity.jpg`,`Masaccio, Holy Trinity`,`c. 1427`,
+  `Masaccio's Holy Trinity (c. 1427, Santa Maria Novella) applies linear perspective: its orthogonal lines converge to a single vanishing point.`,
+  [[`Masaccio / Holy Trinity`,[`masaccio`,`trinity`],[`마사초`,`성 삼위일체`]],[`orthogonal lines / vanishing point`,[`orthogonal`,`vanishing point`,`linear perspective`],[`직교선`,`소실점`,`선원근법`]]],
+  [`L09`,22,`The Holy Trinity with orthogonal lines`]],
+ [`people/durer.jpg`,`Albrecht Dürer's perspective machine`,`1525`,
+  `Albrecht Dürer illustrated a perspective machine in The Painter's Manual (1525): a device that mechanizes perspective drawing through a grid or string — a step toward the virtual camera of computer graphics.`,
+  [[`Dürer`,[`durer`,`dürer`,`painter's manual`],[`뒤러`]],[`perspective machine / device`,[`machine`,`device`,`grid`],[`기계`,`장치`,`격자`]]],
+  [`L09`,32,`illustration of a perspective machine in The Painter's Manual (1525) by Albrecht Dürer`]],
+ [`people/cezanne.jpg`,`Paul Cézanne`,`c. 1890s`,
+  `Paul Cézanne broke with single-viewpoint linear perspective: his paintings combine multiple viewpoints and treat painting as geometric structure, a composition of primitive shapes — the father of modern art, leading to Cubism.`,
+  [[`Cézanne`,[`cezanne`,`cézanne`],[`세잔`]],[`multiple viewpoints / geometric structure → Cubism`,[`multiple`,`viewpoint`,`geometric`,`cubism`,`modern art`],[`다각적`,`시점`,`기하`,`입체파`,`큐비즘`,`현대미술`]]],
+  [`NT`,30,`폴 세잔의 그림은 다각적인 시점을 다 고려한 그림 | 폴 세잔이 말한 그림의 정수는 geometric structure, composition of primitive shapes | Cubism (Picasso), Modernism (reinterpreting the real obj; 폴 세잔: father of modern art)`]]],
+{w:47,n:28});
+
+V(2,`L03`,`From binary to the Turing machine`,
+`The pictures show steps toward the modern computer presented in "Digital." Put them in chronological order and, for each picture, name the person or machine and explain what it contributed.`,
+[[`people/leibniz.jpg`,`Gottfried Leibniz`,`1689`,
+  `Gottfried Leibniz invented the binary numerical system (1689), a system that converts logical verbal statements into pure mathematics.`,
+  [[`Leibniz`,[`leibniz`],[`라이프니츠`]],[`binary system 1689`,[`binary`,`1689`],[`이진`,`2진`]]],
+  [`L03`,9,`Invention of the binary numerical system (1689) • a system that converts logic verbal statements into a pure mathematical one • Gottfried Leibniz`]],
+ [`img/s_loom.jpg`,`Jacquard Loom`,`1804`,
+  `The Jacquard Loom (1804) was controlled by a number of punched cards — a program stored on cards.`,
+  [[`Jacquard loom`,[`jacquard`,`loom`],[`자카드`,`직조기`,`방직기`]],[`punched cards`,[`punch`,`card`],[`천공`,`카드`]]],
+  [`L03`,32,`invented by Joseph Marie Jacquard (1804) • controlled by a number of punched cards | Jacquard Loom`]],
+ [`img/s_babbage.jpg`,`Babbage's Analytical Engine`,`19C (Babbage 1791–1871)`,
+  `Charles Babbage's Analytical Engine — a steam-driven calculating machine, a design for a general programmable computer.`,
+  [[`Babbage / Analytical Engine`,[`babbage`,`analytical engine`],[`배비지`,`해석기관`]],[`steam-driven calculating machine`,[`steam`,`calculat`],[`증기`,`계산`]]],
+  [`L03`,35,`Charles Baddage (1791-1871) • a steam-driven calculating machine | Analytical Engine`]],
+ [`img/s_hollerith.jpg`,`Hollerith's Electric Tabulating Machine`,`1884`,
+  `Herman Hollerith's Electric Tabulating Machine (1884) used a punch card system to process data.`,
+  [[`Hollerith / tabulating machine`,[`hollerith`,`tabulat`],[`홀러리스`,`천공카드 시스템`,`도표`]],[`punch card data processing`,[`punch`,`card`,`data`],[`천공`,`카드`,`데이터`]]],
+  [`L03`,36,`Herman Hollerith • a punch card system | The Electric Tabulating Machine (1884)`]],
+ [`people/turing.jpg`,`Alan Turing`,`20C`,
+  `Alan Turing, founder of computer science: the Turing machine (a head that reads a symbol, writes a symbol and moves left or right) and the Universal Turing machine — any mechanical procedure (algorithm) can be modeled by a Turing machine.`,
+  [[`Turing`,[`turing`],[`튜링`]],[`Turing machine / algorithm`,[`turing machine`,`algorithm`,`universal`,`tape`,`symbol`],[`튜링 기계`,`튜링머신`,`알고리즘`,`범용`]]],
+  [`L03`,41,`Alan's Thesis: "Any mathematical problem solving that can be described by a mechanical procedure (algorithm) can be modeled by a Turing machine."`]]],
+{w:20,n:10});
+
+V(2,`L03`,`From Memex to the Web`,
+`The four pictures show people who shaped hypertext and networked information. Put them in chronological order and, for each picture, explain who it is and what he proposed or built.`,
+[[`people/bush.jpg`,`Vannevar Bush`,`1945`,
+  `Vannevar Bush proposed the Memex in "As We May Think" (1945): a theoretical proto-hypertext system, a memory extender — an enlarged intimate supplement to memory.`,
+  [[`Bush / Memex`,[`bush`,`memex`],[`부시`,`메멕스`]],[`proto-hypertext / memory extender`,[`proto-hypertext`,`memory`,`as we may think`],[`하이퍼텍스트`,`기억`]]],
+  [`L03`,54,`By Vannevar Bush (1890-1974) • proposed in "As we may think" (1945) • The theoretical proto-hypertext computer system • Memory extender`]],
+ [`people/nelson.jpg`,`Ted Nelson`,`1960s`,
+  `Ted Nelson coined "hypertext" — non-sequential writing — with Project Xanadu (1960), and hypermedia (1963).`,
+  [[`Nelson`,[`nelson`,`xanadu`],[`넬슨`,`제너두`]],[`hypertext: non-sequential writing`,[`hypertext`,`non-sequential`,`hypermedia`],[`하이퍼텍스트`,`비순차`,`하이퍼미디어`]]],
+  [`L03`,55,`Coined by Ted Nelson • Hypertext: non-sequential writing • Project Xanadu (1960) • Hypertext, Hypermedia (1963)`]],
+ [`people/engelbart.jpg`,`Douglas Engelbart`,`1968`,
+  `Douglas Engelbart's Mother of All Demos (1968) showed NLS (oN-Line System), the world's first interactive information system, to augment Collective IQ.`,
+  [[`Engelbart`,[`engelbart`],[`엥겔바트`]],[`Mother of All Demos / NLS`,[`mother of all demos`,`nls`,`collective iq`,`interactive`],[`데모`,`NLS`,`집단 지성`,`상호작용`]]],
+  [`L03`,56,`Douglas Engelbart • The Mother of All Demos (1968): the world's first interactive information system, NLS (oN Line System) • Collective IQ`]],
+ [`people/bernerslee.jpg`,`Tim Berners-Lee`,`1989`,
+  `Tim Berners-Lee invented the World Wide Web (1989), making hypertext a global networked system.`,
+  [[`Berners-Lee`,[`berners`],[`버너스`]],[`World Wide Web 1989`,[`world wide web`,`www`,`web`,`1989`],[`월드 와이드 웹`,`웹`]]],
+  [`L03`,57,`Invented by Tim-Berners Lee | WWW (1989)`]]],
+{n:11});
+
+V(3,`L10`,`Museum buildings and museum revolutions`,
+`Look at the four pictures. Put them in chronological order and, for each one, identify it and explain how it relates to "the first museum revolution" and "the second museum revolution" described by Van Mensch.`,
+[[`v/prado.jpg`,`Museo Nacional del Prado`,`1820`,
+  `Museo Nacional del Prado (Spain, 1820): one of the early public national museums — a collections-focused, building-based institution.`,
+  [[`Prado (1820)`,[`prado`],[`프라도`]],[`building-based / collections-focused`,[`building`,`collection`],[`건물`,`소장품`]]],
+  [`L10`,79,`Museo Nacional del Prado (Spain,1820)`]],
+ [`v/ngallery.jpg`,`The National Gallery`,`1824`,
+  `The National Gallery (Britain, 1824): the museum as a 'cultural authority' that prevailed as the model of the public museum.`,
+  [[`National Gallery (1824)`,[`national gallery`],[`내셔널 갤러리`]],[`cultural authority`,[`authority`,`public`],[`권위`,`공공`]]],
+  [`L10`,79,`The National Gallery (Britain,1824)`]],
+ [`v/altes.jpg`,`Altes Museum`,`1830`,
+  `Altes Museum (Germany, 1830). By the end of the 19th century the first museum revolution had made this collections-focused, building-based institution, serving the interests of a narrow social grouping, the dominant model.`,
+  [[`Altes Museum (1830)`,[`altes`],[`알테스`]],[`first museum revolution — end of 19C`,[`first museum revolution`,`first revolution`,`19th`,`narrow`],[`첫 번째 박물관 혁명`,`제1`,`19세기`]]],
+  [`L10`,81,`a collections-focused | building-based | institution prevailed | the museum is a 'cultural authority' | "The first museum revolution" | At the end of the 19th century | the interests of a narrow social grouping`]],
+ [`v/mini.jpg`,`Minicomputers in museums`,`1970s`,
+  `Minicomputers in the 1970s: initial attempts at museum computerization, within the second museum revolution of the 1960s and 1970s that turned the museum outward to society and information.`,
+  [[`Minicomputer / computerization`,[`minicomputer`,`computeriz`,`computer`],[`미니컴퓨터`,`전산화`,`컴퓨터`]],[`second museum revolution — 1960s–70s`,[`second museum revolution`,`second revolution`,`1960s`,`1970s`],[`두 번째 박물관 혁명`,`제2`,`1960`,`1970`]]],
+  [`L10`,85,`Minicomputers in the 1970s`]]],
+{n:26});
+
+V(3,`L08`,`Computation in architecture`,
+`The pictures show how computation entered architectural design, in the order the lecture develops it. Put them in that order and, for each picture, identify the method and explain how it changed the design process.`,
+[[`v/gaudi.jpg`,`Gaudí's hanging model`,`late 19C–early 20C`,
+  `Antoni Gaudí's analogue computation: physical (hanging-chain) models compute parts of the building to understand structural and spatial relationships; Frei Otto and others developed the method further.`,
+  [[`Gaudí / analogue computation`,[`gaudi`,`gaudí`,`analogue`,`analog`],[`가우디`,`아날로그`]],[`physical model computes structure`,[`physical model`,`model`,`structur`],[`물리적 모형`,`모형`,`구조`]]],
+  [`L08`,20,`The method of analogue computation using models • The physical model to compute parts of the building to understand the structural and spatial relationships | Analogue Computation: Antoni Gaudi`]],
+ [`v/disney.jpg`,`Frank Gehry's computational tools`,`late 1980s–1990s`,
+  `Complex forms designed with digital tools became more pervasive over the late 1980s and early 1990s; Frank Gehry influenced the use of computational tools for geometrically complex architecture.`,
+  [[`Gehry`,[`gehry`],[`게리`]],[`digital tools for complex forms`,[`complex form`,`digital tool`,`computational tool`,`software`],[`복잡한 형태`,`디지털 도구`,`소프트웨어`]]],
+  [`L08`,29,`Complex forms designed with digital tools became more pervasive over the late 1980s and early 1990s • Frank Gehry's influence on the use of computational tools`]],
+ [`v/bim.jpg`,`BIM (Building Information Modeling)`,`2000s`,
+  `BIM: a digital representation of physical and functional characteristics of a facility — a shared knowledge resource for decisions during its life cycle, from earliest conception to demolition.`,
+  [[`BIM`,[`bim`,`building information`],[`BIM`,`빌딩 정보`]],[`life-cycle shared knowledge`,[`life cycle`,`lifecycle`,`shared`,`facility`],[`생애주기`,`공유`,`전 과정`]]],
+  [`L08`,31,`Digital representation of physical and functional characteristics of a facility • A shared knowledge resource for information forming a reliable basis for decisions during its life cycle, from earliest conception to demolition | BIM (Building Information Modeling)`]],
+ [`v/gd.jpg`,`Generative design`,`Today`,
+  `Generative design: a strategy that uses computer algorithms to analyze and explore all the design possibilities based on specific goals and constraints, built on parametric design.`,
+  [[`Generative design`,[`generative`],[`생성형 디자인`,`제너러티브`]],[`algorithms explore possibilities under constraints`,[`algorithm`,`constraint`,`possibilit`,`parametric`],[`알고리즘`,`제약`,`가능성`,`파라메트릭`]]],
+  [`L08`,34,`a strategy that uses computer algorithms to analyze and explore all the design possibilities based on specific goals and constraints • Based on parametric design | Generative Design`]]],
+{w:41,n:34});
+
+V(3,`L09`,`From oscillons to AI art`,
+`The four pictures show technology-based art from its beginnings to today. Put them in chronological order and, for each picture, identify the artist and explain what the work shows about the relationship between the artist and the machine.`,
+[[`img/s_oscillon.jpg`,`Ben F. Laposky — Oscillons`,`1950s`,
+  `Ben F. Laposky's Oscillons or Electronic Abstractions (1950s): analog electronic art photographed from oscilloscope screens — credited as the first computer graphics.`,
+  [[`Laposky / Oscillons`,[`laposky`,`oscillon`],[`라포스키`,`오실론`]],[`oscilloscope analog electronic art`,[`oscilloscope`,`analog`,`electronic`,`first computer graphics`],[`오실로스코프`,`아날로그`,`전자`]]],
+  [`L09`,135,`Ben F. Laposky • a mathematician, credited with making the first computer graphics • Oscillons or Electronic Abstractions`]],
+ [`people/nake.jpg`,`Frieder Nake`,`1960s`,
+  `Frieder Nake — Random Polygon Move (1963), Walk-Through-Raster (1966): early digital computer graphics in which the artist writes rules and the computer draws with randomness.`,
+  [[`Nake`,[`nake`],[`나케`]],[`rule-based digital plotter art`,[`algorithm`,`random`,`rule`,`plotter`,`digital`],[`알고리즘`,`무작위`,`규칙`,`디지털`]]],
+  [`L09`,144,`Walk-Through-Raster, series 7.1, 1966 | Random Polygon Move, 1963 | Frieder Nake`]],
+ [`people/cohen.jpg`,`Harold Cohen — AARON`,`1973`,
+  `Harold Cohen's AARON (beginning in 1973): painting software, an AI program that generates original art — the machine itself becomes a creator.`,
+  [[`Cohen / AARON`,[`cohen`,`aaron`],[`코헨`,`아론`]],[`AI program generates original art`,[`ai`,`generat`,`original art`,`software`],[`AI`,`인공지능`,`생성`]]],
+  [`L01`,62,`Painting software by Harold Cohen • AI program that generates original art • Beginning in 1973 | AARON`]],
+ [`people/anadol.jpg`,`Refik Anadol`,`2020s`,
+  `Refik Anadol turns data into art with help from AI — data art and AI art among today's other high-tech-based art.`,
+  [[`Anadol`,[`anadol`],[`아나돌`]],[`data art with AI`,[`data`,`ai`],[`데이터`,`AI`,`인공지능`]]],
+  [`L09`,155,`Artist Refik Anadol Turns Data Into Art, With Help From AI`]]],
+{n:33});
+
 const MANIFEST={"salt": "vtsLFsU02bfEPLu1GjQboQ==", "iter": 250000, "files": {"L01": {"name": "GCT501_01_Culture_and_Technology.pdf", "size": 12891632, "parts": ["enc/L01_0.pdf", "enc/L01_1.pdf"]}, "L02": {"name": "GCT501_02_Philosophy_of_Technology.pdf", "size": 5546765, "parts": ["enc/L02_0.pdf"]}, "L03": {"name": "GCT501_03_Digital.pdf", "size": 6427192, "parts": ["enc/L03_0.pdf"]}, "L05": {"name": "GCT501_05_Pervasive_Computing.pdf", "size": 3292361, "parts": ["enc/L05_0.pdf"]}, "L06": {"name": "GCT501_06_Digital_Media_and_Content.pdf", "size": 5376665, "parts": ["enc/L06_0.pdf"]}, "L07": {"name": "GCT501_07_VR_AR.pdf", "size": 8645705, "parts": ["enc/L07_0.pdf"]}, "L08": {"name": "GCT501_08_Digital_Architecture_and_Digital_Fashion.pdf", "size": 7949668, "parts": ["enc/L08_0.pdf"]}, "L09": {"name": "GCT501_09_AST_Interaction_in_the_Visual_Culture.pdf", "size": 16699373, "parts": ["enc/L09_0.pdf", "enc/L09_1.pdf"]}, "L10": {"name": "GCT501_10_Digital_Heritage_and_Digital_Museum.pdf", "size": 14223184, "parts": ["enc/L10_0.pdf", "enc/L10_1.pdf"]}, "WR": {"name": "GCT501_Lecture_Wrap-up.pdf", "size": 4647088, "parts": ["enc/WR_0.pdf"]}, "NT": {"name": "GCT501_Lecture_Notes.pdf", "size": 1783096, "parts": ["enc/NT_0.pdf"]}}, "check": "2DoUhEjhELtSyKWvglxwsxBLjmrqMf2gc+rDFD7BqOvZpAlSjQ=="};
-const BYID={};[...MCQ,...SHORT,...ESSAY,...PEOPLE].forEach(x=>BYID[x.id]=x);
+const BYID={};[...MCQ,...SHORT,...ESSAY,...PEOPLE,...VIS].forEach(x=>BYID[x.id]=x);
 
 /* ======================= UTIL ======================= */
 const $=(s,r=document)=>r.querySelector(s);
@@ -2291,7 +2559,7 @@ function tagHTML(q){
 function srcHTML(lec,p,quote){return `<div class="src"><div class="who">출처 · <b>${esc(lecName(lec))}</b> · p.${esc(p)}</div><blockquote>${esc(quote)}</blockquote></div>`;}
 function slideHTML(q){
   const list=[];const add=(l,p)=>{if(!list.some(x=>x[0]===l&&String(x[1])===String(p)))list.push([l,p]);};
-  if(q.kind==='essay')q.quotes.forEach(x=>add(x[0],x[1]));else add(q.lec,q.p); if(q.w)add('WR',q.w); if(q.n)add('NT',q.n);
+  if(q.kind==='essay')q.quotes.forEach(x=>add(x[0],x[1]));else if(q.kind==='visual')q.items.forEach(i=>add(i.src[0],i.src[1]));else add(q.lec,q.p); if(q.w)add('WR',q.w); if(q.n)add('NT',q.n);
   return `<details class="slide"><summary>관련 슬라이드 보기 (${list.map(([l,p])=>esc(l)+' p.'+p).join(', ')})</summary>${list.map(([l,p])=>`<img src="slides/${l}_${p}.jpg" alt="${esc(lecName(l))} p.${p}" loading="lazy">`).join('')}</details>`;
 }
 function initials(n){return n.split(/[\s.\-]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
@@ -2305,7 +2573,7 @@ try{const t=localStorage.getItem(SKEY);if(t)ST=Object.assign(fresh(),JSON.parse(
 function save(){try{localStorage.setItem(SKEY,JSON.stringify(ST));}catch(e){}}
 
 /* ======================= SET BUILDING ======================= */
-const FORMATS={full:{m:15,s:6,p:2,e:2,label:`실전형`},quick:{m:10,s:4,p:1,e:1,label:`빠른 연습`},legacy:{m:20,s:0,p:0,e:5,label:`지난 형식`}};
+const FORMATS={full:{m:15,s:6,p:2,e:2,v:1,label:`실전형`},quick:{m:10,s:4,p:1,e:1,v:0,label:`빠른 연습`},legacy:{m:20,s:0,p:0,e:4,v:1,label:`지난 형식`},photo:{m:0,s:0,p:0,e:0,v:3,label:`사진 서술만`}};
 let chosenLv=1, chosenFmt='full', chosenScope='all';
 const inScope=q=>chosenScope==='all'||q.w||q.n;
 function pickStrat(pool,n){const by={};shuffle(pool).forEach(x=>(by[x.lec]=by[x.lec]||[]).push(x));const ks=shuffle(Object.keys(by));const out=[];while(out.length<n&&ks.some(k=>by[k].length)){for(const k of ks){if(out.length>=n)break;if(by[k].length)out.push(by[k].shift());}}return out;}
@@ -2327,18 +2595,19 @@ function buildSet(lv){
   const m=drawFrom(MCQ.filter(x=>x.lv===lv&&inScope(x)),F.m,seen);
   const s=drawFrom(SHORT.filter(x=>x.lv===lv&&inScope(x)),F.s,seen);
   const e=drawFrom(ESSAY.filter(x=>x.lv===lv&&inScope(x)),F.e,seen);
+  const v=drawFrom(VIS.filter(x=>x.lv===lv&&inScope(x)),F.v||0,seen);
   const pp=peoplePool(lv); const matches=[]; const pseen=new Set(seen);
   for(let i=0;i<F.p;i++){const mt=buildMatch(pp,pseen);mt.ids.forEach(id=>pseen.add(id));matches.push(mt);}
   let ns=ST.seen[lv]||[];
-  if(m.reset) ns=ns.filter(id=>id[0]!=='m'); if(s.reset) ns=ns.filter(id=>id[0]!=='s'); if(e.reset) ns=ns.filter(id=>id[0]!=='e');
+  if(m.reset) ns=ns.filter(id=>id[0]!=='m'); if(s.reset) ns=ns.filter(id=>id[0]!=='s'); if(e.reset) ns=ns.filter(id=>id[0]!=='e'); if(v.reset) ns=ns.filter(id=>id[0]!=='v');
   const pids=matches.flatMap(x=>x.ids); if(pp.filter(x=>!seen.has(x.id)).length<pids.length) ns=ns.filter(id=>id[0]!=='p');
-  ST.seen[lv]=[...new Set([...ns,...m.a.map(x=>x.id),...s.a.map(x=>x.id),...e.a.map(x=>x.id),...pids])];
+  ST.seen[lv]=[...new Set([...ns,...m.a.map(x=>x.id),...s.a.map(x=>x.id),...e.a.map(x=>x.id),...v.a.map(x=>x.id),...pids])];
   ST.sets=(ST.sets||0)+1;
   return {mode:'exam',lv,no:ST.sets,fmt:chosenFmt,date:new Date().toISOString().slice(0,10),
-    mcq:m.a.map(x=>({id:x.id,order:shuffle([0,1,2,3])})),short:s.a.map(x=>x.id),match:matches,essay:e.a.map(x=>x.id),ans:{}};
+    mcq:m.a.map(x=>({id:x.id,order:shuffle([0,1,2,3])})),short:s.a.map(x=>x.id),match:matches,essay:e.a.map(x=>x.id),visual:v.a.map(x=>({id:x.id,order:shuffle(x.items.map((_,i)=>i))})),ans:{}};
 }
 function remaining(lv){const seen=new Set(ST.seen[lv]||[]);const f=a=>[a.filter(x=>!seen.has(x.id)).length,a.length];
-  return {m:f(MCQ.filter(x=>x.lv===lv)),s:f(SHORT.filter(x=>x.lv===lv)),e:f(ESSAY.filter(x=>x.lv===lv)),p:f(peoplePool(lv))};}
+  return {m:f(MCQ.filter(x=>x.lv===lv)),s:f(SHORT.filter(x=>x.lv===lv)),e:f(ESSAY.filter(x=>x.lv===lv)),v:f(VIS.filter(x=>x.lv===lv)),p:f(peoplePool(lv))};}
 
 /* ======================= WRONG NOTES ======================= */
 function addWrong(id,payload){const w=ST.wrong[id]||{id,n:0};w.n++;w.t=Date.now();Object.assign(w,payload);ST.wrong[id]=w;updateBadge();}
@@ -2385,17 +2654,17 @@ function renderQuiz(){
   const app=$('#app');
   if(ST.current&&ST.current.mode==='exam'){app.innerHTML='';app.appendChild(paperFor(ST.current,`Introduction to Culture Technology`,`GCT501 · Practice Examination · Set ${ST.current.no}`));return;}
   const R=[1,2,3].map(remaining);
-  const counts={m:MCQ.length,s:SHORT.length,p:PEOPLE.length,e:ESSAY.length};
+  const counts={m:MCQ.length,s:SHORT.length,p:PEOPLE.length,e:ESSAY.length,v:VIS.length};
   app.innerHTML=`<section class="sheet">
     <div class="exam-head"><div class="t"><small>GCT501 · Introduction to Culture Technology</small><h1>Practice Examination</h1></div>
       <div class="meta"><div>구성</div><div>객관식 · 단답 · 매칭 · 서술</div><div>언어</div><div>지문 English · 답안 한/영</div><div>누적 세트</div><div>${ST.sets||0}</div></div></div>
     <p class="lede" style="margin-top:18px">지난 실제 시험 순서대로 <b>객관식 → 단답형 → 인물 매칭 → 서술형</b>으로 출제합니다. GCT501 강의자료 9개, Lecture Wrap-up, 문화기술론 강의노트에서만 나오며, 이미 푼 문제는 그 난이도를 다 풀 때까지 다시 나오지 않습니다.</p>
     <div class="levels" role="group" aria-label="난이도">
-      ${[1,2,3].map(l=>`<button class="lv" id="lv${l}" aria-pressed="${l===chosenLv}" data-lv="${l}"><i>${LVE[l]}</i><b>${LVN[l]}</b><span>${l===1?'정의·인물·연도 등 기본 개념':l===2?'유사 개념 구분, 목록, 분류':'시나리오 적용, 계산, 원문 정의'}</span><span class="stat">새 문제: 객관식 ${R[l-1].m[0]}/${R[l-1].m[1]} · 단답 ${R[l-1].s[0]} · 서술 ${R[l-1].e[0]} · 인물 ${R[l-1].p[0]}</span></button>`).join('')}
+      ${[1,2,3].map(l=>`<button class="lv" id="lv${l}" aria-pressed="${l===chosenLv}" data-lv="${l}"><i>${LVE[l]}</i><b>${LVN[l]}</b><span>${l===1?'정의·인물·연도 등 기본 개념':l===2?'유사 개념 구분, 목록, 분류':'시나리오 적용, 계산, 원문 정의'}</span><span class="stat">새 문제: 객관식 ${R[l-1].m[0]}/${R[l-1].m[1]} · 단답 ${R[l-1].s[0]} · 서술 ${R[l-1].e[0]} · 사진 서술 ${R[l-1].v[0]} · 인물 ${R[l-1].p[0]}</span></button>`).join('')}
     </div>
-    <div class="opts-row"><b>형식</b><div class="seg" role="group" aria-label="형식">${Object.entries(FORMATS).map(([k,f])=>`<button data-fmt="${k}" aria-pressed="${k===chosenFmt}">${f.label} · ${[f.m&&'객관식 '+f.m,f.s&&'단답 '+f.s,f.p&&'매칭 '+f.p,f.e&&'서술 '+f.e].filter(Boolean).join(' · ')}</button>`).join('')}</div></div>
+    <div class="opts-row"><b>형식</b><div class="seg" role="group" aria-label="형식">${Object.entries(FORMATS).map(([k,f])=>`<button data-fmt="${k}" aria-pressed="${k===chosenFmt}">${f.label} · ${[f.m&&'객관식 '+f.m,f.s&&'단답 '+f.s,f.p&&'매칭 '+f.p,f.e&&'서술 '+f.e,f.v&&'사진 서술 '+f.v].filter(Boolean).join(' · ')}</button>`).join('')}</div></div>
     <div class="opts-row"><b>범위</b><div class="seg" role="group" aria-label="범위"><button data-scope="all" aria-pressed="${chosenScope==='all'}">전체 강의</button><button data-scope="wn" aria-pressed="${chosenScope==='wn'}">Wrap-up · 강의노트에 나온 것만</button></div></div>
-    <div class="row"><button class="btn" id="start">${LVN[chosenLv]} 세트 시작</button><span class="stat">문제은행: 객관식 ${counts.m} · 단답 ${counts.s} · 인물 ${counts.p} · 서술 ${counts.e}</span></div>
+    <div class="row"><button class="btn" id="start">${LVN[chosenLv]} 세트 시작</button><span class="stat">문제은행: 객관식 ${counts.m} · 단답 ${counts.s} · 인물 ${counts.p} · 서술 ${counts.e} · 사진 서술 ${counts.v}</span></div>
     ${ST.history&&ST.history.length?`<div class="part"><h2>최근 기록</h2><span>최근 5세트</span></div><ul class="files">${ST.history.slice(-5).reverse().map(h=>`<li><span class="code">#${h.no}</span><div class="fn"><b>${LVN[h.lv]} · 객관식 ${h.mc} · 단답 ${h.sa} · 매칭 ${h.pm} · 서술 평균 ${h.es}</b><span>${h.date}</span></div></li>`).join('')}</ul>`:''}
     ${(ST.sets||Object.keys(ST.wrong).length)?`<div class="row" style="margin-top:22px"><button class="btn sm ghost" id="resetAll">기록 전체 초기화</button><span class="stat">푼 문제·세트 기록·오답노트를 모두 처음 상태로</span></div><div id="resetC"></div>`:''}
   </section>`;
@@ -2419,7 +2688,8 @@ function paperFor(set,title,sub){
   if(set.mcq.length){head('Multiple Choice',`${set.mcq.length} questions`);set.mcq.forEach(it=>parts.appendChild(mcqEl(set,it,++n)));}
   if(set.short.length){head('Short Answer',`${set.short.length} questions · 단어나 짧은 구로 답하세요`);set.short.forEach(id=>parts.appendChild(shortEl(set,id,++n)));}
   if(set.match.length){head('Matching',`${set.match.length} questions · 인물과 업적을 선으로 연결하세요`);set.match.forEach(mt=>parts.appendChild(matchEl(set,mt,++n)));}
-  if(set.essay.length){head('Essay',`${set.essay.length} questions`);set.essay.forEach(id=>parts.appendChild(essayEl(set,id,++n)));}
+  const vis=set.visual||[];
+  if(set.essay.length||vis.length){head('Essay',`${set.essay.length+vis.length} questions${vis.length?` · 사진 서술 ${vis.length}`:''}`);set.essay.forEach(id=>parts.appendChild(essayEl(set,id,++n)));vis.forEach(it=>parts.appendChild(visualEl(set,it,++n)));}
   renderSummary(set,sec.querySelector('#summary'));
   return sec;
 }
@@ -2504,13 +2774,53 @@ function essayEl(set,id,n){
   };draw();return el;
 }
 
+function gradeVisual(q,order,texts){
+  const n=q.items.length;let ordOk=0;const per=q.items.map((it,i)=>{const pos=order[i];if(pos===i)ordOk++;const text=texts[i]||'';
+    const res=it.keys.map(k=>{const terms=[...k.en,...k.ko];let sp=[];terms.forEach(tm=>sp=sp.concat(findAll(text,tm)));return {t:k.t,hit:sp.length>0,spans:sp,terms};});return {pos,res,text};});
+  const kt=per.reduce((s,p)=>s+p.res.length,0),kh=per.reduce((s,p)=>s+p.res.filter(r=>r.hit).length,0);
+  const score=Math.round(20*ordOk/n+80*kh/kt);return {per,ordOk,n,kh,kt,score};
+}
+function visualEl(set,it,n){
+  const q=BYID[it.id];const el=document.createElement('div');el.className='q';const disp=it.order;
+  const draw=()=>{const a=set.ans[it.id]||{order:{},texts:{}};const done=a.graded;const N=q.items.length;
+    const g=done?gradeVisual(q,q.items.map((_,i)=>a.order[i]),q.items.map((_,i)=>a.texts[i])):null;
+    const L=i=>LETTERS[disp.indexOf(i)];
+    el.innerHTML=`<div class="qhead"><div class="qn">${n}.</div><div class="qstem">${esc(q.q)}</div></div>
+      <div class="qtag">${q.id.toUpperCase()} · ${esc(q.lec)}${q.w?' · <span class="wr">Wrap-up</span>':''}${q.n?' · <span class="wr">강의노트</span>':''} · 사진 ${N}장 · ① 순서 정하기 ② 사진마다 설명</div>
+      ${done?`<div class="fb ${g.score>=60?'ok':'no'}" style="margin-top:12px"><div class="verdict">${g.score}/100 · ${g.score>=60?'통과':'보완 필요 · 오답노트에 저장됨'} <span class="concept">· ${esc(q.c)}</span></div>
+        <p class="ex">순서 ${g.ordOk}/${g.n} 맞음 · 핵심 요소 ${g.kh}/${g.kt}개 씀 (순서 20점 + 설명 80점)</p>
+        <div class="ex"><b>정답 순서:</b> <span class="vorder ans-ok">${q.items.map((_,i)=>L(i)).join(' → ')}</span>${g.ordOk<g.n?` &nbsp;<span class="stat">내 순서: ${[...Array(N).keys()].map(p=>{const i=q.items.findIndex((_,k)=>a.order[k]===p);return i<0?'?':L(i);}).join(' → ')}</span>`:''}</div>${slideHTML(q)}</div>`:''}
+      <div class="vgrid">${disp.map(i=>{const itm=q.items[i];const pi=g&&g.per[i];const cls=g?(pi.pos===i?' ok':' no'):'';
+        return `<figure class="vfig${cls}" style="margin:0"><div class="vimg"><img src="${esc(itm.img)}" alt="사진 ${L(i)}" loading="lazy"><span class="vlet">${L(i)}</span>${g?`<span class="vpos">${i+1}번째${pi.pos===i?' ✓':''}</span>`:''}</div>
+          <div class="vbody">${g?`<div class="vname">${esc(itm.name)}<small>${esc(itm.when)}${pi.pos!==i?` · 내가 고른 순서: ${pi.pos!=null?pi.pos+1+'번째':'없음'}`:''}</small></div>
+            <ul class="keys">${pi.res.map(r=>`<li class="${r.hit?'hit':'miss'}"><span class="mk">${r.hit?'✓':'✗'}</span><span>${esc(r.t)}</span></li>`).join('')}</ul>
+            ${pi.text?`<div class="glabel">내 설명</div><div class="mine">${markSpans(pi.text,pi.res.flatMap(r=>r.spans))}</div>`:'<div class="stat">설명을 쓰지 않았습니다.</div>'}
+            <div class="glabel">모범 설명</div><div class="model">${modelHTML(itm,pi.res)}</div>${srcHTML(itm.src[0],itm.src[1],itm.src[2])}`
+          :`<label>순서 <select data-o="${i}"><option value="">–</option>${[...Array(N).keys()].map(p=>`<option value="${p}" ${a.order[i]===p?'selected':''}>${p+1}번째</option>`).join('')}</select></label>
+            <label class="pick" for="vt-${it.id}-${i}">사진 ${L(i)} 설명</label><textarea id="vt-${it.id}-${i}" data-t="${i}" placeholder="${L(i)}: 무엇/누구인지, 언제, 어떤 의미인지 (한/영)">${esc(a.texts[i]||'')}</textarea>`}</div></figure>`;}).join('')}</div>
+      ${done?(set.mode==='retry'&&g.score>=60&&ST.wrong[q.id]?`<div class="row" style="margin:10px 0 0 40px"><button class="btn sm ghost" data-rm="${q.id}">이제 알아요 · 오답노트에서 지우기</button></div>`:'')
+        :`<div class="row" style="margin:12px 0 0 40px"><button class="btn" data-grade>채점하기</button><span class="ehint">같은 순서를 두 번 고를 수 없습니다. 설명은 강의 용어를 쓸수록 점수가 올라갑니다.</span></div>`}`;
+    const keep=()=>{set.ans[it.id]=a;clearTimeout(el._t);el._t=setTimeout(save,600);};
+    el.querySelectorAll('[data-o]').forEach(s=>s.onchange=()=>{const i=+s.dataset.o;const v=s.value===''?null:+s.value;
+      if(v!=null)Object.keys(a.order).forEach(k=>{if(a.order[k]===v&&+k!==i)delete a.order[k];});if(v==null)delete a.order[i];else a.order[i]=v;keep();
+      el.querySelectorAll('[data-o]').forEach(o=>{const k=+o.dataset.o;o.value=a.order[k]!=null?a.order[k]:'';});});
+    el.querySelectorAll('[data-t]').forEach(ta=>ta.addEventListener('input',()=>{a.texts[+ta.dataset.t]=ta.value;keep();}));
+    const gb=el.querySelector('[data-grade]');
+    if(gb)gb.onclick=()=>{const filled=Object.values(a.texts).some(x=>x&&x.trim());if(!filled){el.querySelector('textarea').focus();return;}
+      const r=gradeVisual(q,q.items.map((_,i)=>a.order[i]),q.items.map((_,i)=>a.texts[i]));a.graded=true;a.score=r.score;set.ans[it.id]=a;
+      if(r.score<60)addWrong(q.id,{type:'visual',score:r.score,ordOk:r.ordOk,miss:r.per.flatMap((p,i)=>p.res.filter(x=>!x.hit).map(x=>`${L(i)} · ${q.items[i].name} — ${x.t}`))});
+      save();draw();refreshSummary(set);};
+    const rm=el.querySelector('[data-rm]');if(rm)rm.onclick=()=>{removeWrong(q.id);rm.replaceWith(Object.assign(document.createElement('span'),{className:'stat',textContent:'오답노트에서 지웠습니다.'}));};
+  };draw();return el;
+}
+
 function setStats(set){
   const mc=set.mcq.filter(i=>set.ans[i.id]===0).length,md=set.mcq.filter(i=>set.ans[i.id]!=null).length;
   const sa=set.short.filter(id=>set.ans[id]&&set.ans[id].ok).length,sd=set.short.filter(id=>set.ans[id]&&set.ans[id].done).length;
   const pt=set.match.reduce((s,m)=>s+m.ids.length,0),pr=set.match.reduce((s,m)=>s+((set.ans[m.id]&&set.ans[m.id].score)||0),0),pd=set.match.filter(m=>set.ans[m.id]&&set.ans[m.id].done).length;
-  const eg=set.essay.filter(id=>set.ans[id]&&set.ans[id].graded);const es=eg.length?Math.round(eg.reduce((s,id)=>s+set.ans[id].score,0)/eg.length):0;
-  return {mc,md,mt:set.mcq.length,sa,sd,st:set.short.length,pr,pt,pd,mt2:set.match.length,es,eg:eg.length,et:set.essay.length,
-    complete:md===set.mcq.length&&sd===set.short.length&&pd===set.match.length&&eg.length===set.essay.length};
+  const eids=[...set.essay,...(set.visual||[]).map(v=>v.id)];const eg=eids.filter(id=>set.ans[id]&&set.ans[id].graded);const es=eg.length?Math.round(eg.reduce((s,id)=>s+set.ans[id].score,0)/eg.length):0;
+  return {mc,md,mt:set.mcq.length,sa,sd,st:set.short.length,pr,pt,pd,mt2:set.match.length,es,eg:eg.length,et:eids.length,
+    complete:md===set.mcq.length&&sd===set.short.length&&pd===set.match.length&&eg.length===eids.length};
 }
 function renderSummary(set,host){
   const s=setStats(set);
@@ -2528,7 +2838,7 @@ function refreshSummary(set){const hs=document.querySelectorAll('#summary');cons
 
 /* ======================= NOTES VIEW ======================= */
 let noteFilter='all',retrySet=null;
-const TYPE_KO={mcq:'객관식',short:'단답형',pair:'인물 매칭',essay:'서술형'};
+const TYPE_KO={mcq:'객관식',short:'단답형',pair:'인물 매칭',essay:'서술형',visual:'사진 서술'};
 function renderNotes(){
   const app=$('#app');
   const all=Object.values(ST.wrong).filter(w=>BYID[w.id]).sort((a,b)=>b.t-a.t);
@@ -2536,11 +2846,11 @@ function renderNotes(){
   const list=all.filter(w=>noteFilter==='all'||w.type===noteFilter||BYID[w.id].lec===noteFilter);
   app.innerHTML='';const sec=document.createElement('section');sec.className='sheet';
   sec.innerHTML=`<div class="exam-head"><div class="t"><small>GCT501 · Review</small><h1>오답노트</h1></div>
-      <div class="meta"><div>전체</div><div>${all.length}개</div><div>객관식·단답</div><div>${all.filter(w=>w.type==='mcq'||w.type==='short').length}</div><div>매칭·서술</div><div>${all.filter(w=>w.type==='pair'||w.type==='essay').length}</div></div></div>
+      <div class="meta"><div>전체</div><div>${all.length}개</div><div>객관식·단답</div><div>${all.filter(w=>w.type==='mcq'||w.type==='short').length}</div><div>매칭·서술</div><div>${all.filter(w=>w.type==='pair'||w.type==='essay'||w.type==='visual').length}</div></div></div>
     <p class="instr">틀린 <b>개념·인물</b>이 먼저 보이고 문제 지문은 접혀 있습니다. 완전히 이해한 항목은 오른쪽 위 ×로 지우세요. 맨 아래에서 오답만 다시 풀 수 있습니다.</p>
     <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn sm ghost" id="exportB">백업 파일 저장</button><label class="btn sm ghost" for="importF" style="cursor:pointer">백업 불러오기</label><input type="file" id="importF" accept="application/json" hidden>${all.length?'<button class="btn sm ghost" id="clearNotes">오답노트 전체 비우기</button>':''}</div>
     <div id="clearC"></div><p class="msg" id="bmsg" aria-live="polite"></p>
-    ${all.length?`<div class="ntools" role="group" aria-label="필터">${[['all','전체'],['mcq','객관식'],['short','단답형'],['pair','인물 매칭'],['essay','서술형'],...lecs.map(l=>[l,l])].map(([k,t])=>`<button class="chip" data-f="${k}" aria-pressed="${noteFilter===k}">${esc(t)}</button>`).join('')}</div>`:''}
+    ${all.length?`<div class="ntools" role="group" aria-label="필터">${[['all','전체'],['mcq','객관식'],['short','단답형'],['pair','인물 매칭'],['essay','서술형'],['visual','사진 서술'],...lecs.map(l=>[l,l])].map(([k,t])=>`<button class="chip" data-f="${k}" aria-pressed="${noteFilter===k}">${esc(t)}</button>`).join('')}</div>`:''}
     <div id="nlist"></div>`;
   app.appendChild(sec);
   sec.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{noteFilter=b.dataset.f;renderNotes();});
@@ -2559,7 +2869,7 @@ function renderNotes(){
   $('#retry').onclick=()=>{
     const ids=shuffle(list.map(w=>w.id));const pairs=ids.filter(i=>BYID[i].kind==='pair');const match=[];
     for(let i=0;i<pairs.length;i+=5){const g=pairs.slice(i,i+5);if(g.length<2){const more=shuffle(PEOPLE.filter(p=>!g.includes(p.id))).slice(0,2-g.length).map(p=>p.id);g.push(...more);}const used=new Set(g);const extra=shuffle(PEOPLE.filter(p=>!used.has(p.id)))[0].id;match.push({id:'match-r'+i,ids:g,right:shuffle([...g,extra]),distractor:extra});}
-    retrySet={mode:'retry',lv:0,no:0,date:new Date().toISOString().slice(0,10),mcq:ids.filter(i=>BYID[i].kind==='mcq').map(id=>({id,order:shuffle([0,1,2,3])})),short:ids.filter(i=>BYID[i].kind==='short'),match,essay:ids.filter(i=>BYID[i].kind==='essay'),ans:{}};
+    retrySet={mode:'retry',lv:0,no:0,date:new Date().toISOString().slice(0,10),mcq:ids.filter(i=>BYID[i].kind==='mcq').map(id=>({id,order:shuffle([0,1,2,3])})),short:ids.filter(i=>BYID[i].kind==='short'),match,essay:ids.filter(i=>BYID[i].kind==='essay'),visual:ids.filter(i=>BYID[i].kind==='visual').map(id=>({id,order:shuffle(BYID[id].items.map((_,i)=>i))})),ans:{}};
     renderNotes();setTimeout(()=>{const s=document.querySelectorAll('.sheet');s[s.length-1].scrollIntoView({behavior:'smooth'});},30);
   };
 }
@@ -2571,6 +2881,9 @@ function noteEl(w){
   if(q.kind==='mcq')body=`<div class="note-b"><div class="ans-ok">정답 · ${esc(q.o[0])}</div><div>내 답 · <span class="ans-no">${esc(w.my||'')}</span></div><div class="ex">${esc(q.ex)}</div>${srcHTML(q.lec,q.p,q.qt)}<details><summary>문제 지문 보기</summary><p style="margin:6px 0 0">${esc(q.q)}</p>${q.stem?`<img class="stemimg" style="margin-left:0" src="img/${q.stem}.jpg" alt="">`:''}</details>${slideHTML(q)}</div>`;
   else if(q.kind==='short')body=`<div class="note-b"><div class="ans-ok">정답 · ${esc(q.ans)}</div><div>내 답 · <span class="ans-no">${esc(w.my||'')}</span></div><div class="ex">${esc(q.ex)}</div>${srcHTML(q.lec,q.p,q.qt)}<details><summary>문제 지문 보기</summary><p style="margin:6px 0 0">${esc(q.q)}</p></details>${slideHTML(q)}</div>`;
   else if(isP)body=`<div class="note-b"><div class="ans-ok">업적 · ${esc(q.ach)}</div>${w.my?`<div>내가 연결한 것 · <span class="ans-no">${esc(w.my)}</span></div>`:''}${srcHTML(q.lec,q.p,q.qt)}${slideHTML(q)}</div>`;
+  else if(q.kind==='visual')body=`<div class="note-b"><div class="ex"><b>정답 순서</b></div><div class="vgrid" style="margin-left:0;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">${q.items.map((it,i)=>`<figure class="vfig" style="margin:0"><div class="vimg"><img src="${esc(it.img)}" alt="" loading="lazy"><span class="vlet">${i+1}</span></div><div class="vbody"><div class="vname">${esc(it.name)}<small>${esc(it.when)}</small></div></div></figure>`).join('')}</div>
+    <div><b style="color:var(--red)">빠뜨린 핵심 (${w.score??0}점 · 순서 ${w.ordOk??0}/${q.items.length})</b><ul class="misslist">${(w.miss||[]).map(m=>`<li>${esc(m)}</li>`).join('')}</ul></div>
+    <details><summary>사진별 모범 설명 보기</summary>${q.items.map((it,i)=>`<p style="margin:6px 0"><b>${i+1}. ${esc(it.name)}</b> — ${esc(it.model)}</p>`).join('')}</details>${q.items.map(it=>srcHTML(it.src[0],it.src[1],it.src[2])).join('')}<details><summary>문제 지문 보기</summary><p style="margin:6px 0 0">${esc(q.q)}</p></details></div>`;
   else body=`<div class="note-b"><div><b style="color:var(--red)">빠뜨린 핵심 (${w.score??0}점)</b><ul class="misslist">${(w.miss||[]).map(m=>`<li>${esc(m)}</li>`).join('')}</ul></div><details><summary>모범 답안 보기</summary><div class="model" style="margin-top:6px">${esc(q.model)}</div></details><details><summary>내가 쓴 답안 보기</summary><div class="mine" style="margin-top:6px">${esc(w.my||'')}</div></details>${q.quotes.map(x=>srcHTML(x[0],x[1],x[2])).join('')}<details><summary>문제 지문 보기</summary><p style="margin:6px 0 0">${esc(q.q)}</p></details></div>`;
   el.innerHTML=head+body+'<div data-c></div>';
   el.querySelector('.nx').onclick=()=>{const c=el.querySelector('[data-c]');c.innerHTML=`<div class="confirm"><span>"${esc(q.c)}" 항목을 오답노트에서 지울까요?</span><button class="btn sm danger" data-y>지우기</button><button class="btn sm ghost" data-n>취소</button></div>`;c.querySelector('[data-n]').onclick=()=>c.innerHTML='';c.querySelector('[data-y]').onclick=()=>{removeWrong(w.id);renderNotes();};};
@@ -2585,7 +2898,7 @@ async function decryptBuf(key,buf){const u=new Uint8Array(buf);return crypto.sub
 const fmtMB=n=>(n/1048576).toFixed(1)+' MB';
 function renderMaterials(){
   const app=$('#app');const entries=Object.entries(MANIFEST.files);
-  const cov={};[...MCQ,...SHORT,...ESSAY,...PEOPLE].forEach(q=>{cov[q.lec]=(cov[q.lec]||0)+1;if(q.w)cov.WRx=(cov.WRx||0)+1;if(q.n)cov.NTx=(cov.NTx||0)+1;});
+  const cov={};[...MCQ,...SHORT,...ESSAY,...PEOPLE,...VIS].forEach(q=>{cov[q.lec]=(cov[q.lec]||0)+1;if(q.w)cov.WRx=(cov.WRx||0)+1;if(q.n)cov.NTx=(cov.NTx||0)+1;});
   app.innerHTML=`<section class="sheet">
     <div class="exam-head"><div class="t"><small>GCT501 · Course Materials</small><h1>강의자료</h1></div>
       <div class="meta"><div>파일</div><div>${entries.length}개 PDF</div><div>보호</div><div>AES-256 암호화</div><div>상태</div><div>${unlockedKey?'잠금 해제됨':'잠김'}</div></div></div>
@@ -2609,7 +2922,7 @@ async function download(code,btn){
 }
 
 /* ======================= BOOT ======================= */
-if(ST.current){const c=ST.current;const ok=c.mcq&&c.mcq.every(i=>BYID[i.id])&&c.short.every(i=>BYID[i])&&c.essay.every(i=>BYID[i])&&c.match.every(m=>m.ids.every(i=>BYID[i])&&m.right.every(i=>BYID[i]));if(!ok)ST.current=null;}
+if(ST.current){const c=ST.current;const ok=c.mcq&&c.mcq.every(i=>BYID[i.id])&&c.short.every(i=>BYID[i])&&c.essay.every(i=>BYID[i])&&(c.visual||[]).every(v=>BYID[v.id])&&c.match.every(m=>m.ids.every(i=>BYID[i])&&m.right.every(i=>BYID[i]));if(!ok)ST.current=null;}
 render();
 </script>
 </body>
